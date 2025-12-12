@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Shoe Size Converter</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --accent-color: #667eea;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            position: relative;
+        }
+
+        /* Fixed Background Container */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        /* Animated Element */
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.1) 0%, rgba(102, 126, 234, 0.05) 100%);
+            animation: rotateBackground 60s linear infinite;
+        }
+
+        @keyframes rotateBackground {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            /* Increased from 500px */
+            margin: 20px;
+            perspective: 1000px;
+            /* For 3D effects */
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.05);
+            padding: 50px;
+            /* Increased padding */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            font-weight: 800;
+            /* Bolder */
+            font-size: 2.5rem;
+            /* Larger title */
+            margin-bottom: 2.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            letter-spacing: -1px;
+        }
+
+        .form-label {
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            /* Larger label */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-select,
+        .form-control {
+            border-radius: 16px;
+            /* Rounder */
+            border: 2px solid #e2e8f0;
+            padding: 16px 20px;
+            /* Larger hit area */
+            font-size: 1.2rem;
+            /* Larger text */
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+        }
+
+        .form-select:focus,
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background-color: #fff;
+            transform: scale(1.01);
+        }
+
+        .btn-convert {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            /* Larger button */
+            color: white;
+            font-weight: 700;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            font-size: 1.3rem;
+            /* Larger text */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-convert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+        }
+
+        .btn-convert:active {
+            transform: translateY(1px);
+        }
+
+        /* Results Section */
+        #results-area {
+            margin-top: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: none;
+            /* Hidden by default */
+        }
+
+        #results-area.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+
+        .result-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .conversion-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .conversion-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+        }
+
+        .conversion-table td {
+            padding: 18px 15px;
+            background: #f8fafc;
+            font-weight: 800;
+            color: var(--text-main);
+            font-size: 1.3rem;
+            /* Larger result text */
+        }
+
+        .conversion-table tr td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            color: var(--accent-color);
+        }
+
+        .conversion-table tr td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+            text-align: right;
+        }
+
+        /* Toggle Switch for Gender */
+        .btn-group-custom {
+            display: flex;
+            background: #e2e8f0;
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 25px;
+        }
+
+        .gender-radio {
+            display: none;
+        }
+
+        .gender-label {
+            flex: 1;
+            text-align: center;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .gender-radio:checked+.gender-label {
+            background: white;
+            color: var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            vertical-align: text-bottom;
+            border: .25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border .75s linear infinite;
+        }
+
+        @keyframes spinner-border {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-animation"></div>
+
+    <div class="app-container">
+        <div class="card">
+            <h1>Size Converter</h1>
+
+            <form id="converter-form">
+                <!-- Gender Selection -->
+                <div class="mb-3">
+                    <label class="form-label d-block text-center">Select Gender</label>
+                    <div class="btn-group-custom">
+                        <input type="radio" class="gender-radio" name="gender" id="gender-men" value="men" checked>
+                        <label class="gender-label" for="gender-men">Men</label>
+
+                        <input type="radio" class="gender-radio" name="gender" id="gender-women" value="women">
+                        <label class="gender-label" for="gender-women">Women</label>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-5 col-12">
+                        <label for="scale" class="form-label">Unit</label>
+                        <select class="form-select" id="scale" required>
+                            <option value="US" selected>US Setup</option>
+                            <option value="EU">EU Sizes</option>
+                            <option value="UK">UK Sizes</option>
+                            <option value="CM">CM (Japan)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-7 col-12">
+                        <label for="size" class="form-label">Size</label>
+                        <input type="number" step="0.5" class="form-control" id="size" placeholder="e.g. 9.5" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-convert ripple">
+                    <span id="btn-text">Convert Now</span>
+                    <span id="btn-spinner" class="spinner" style="display: none;"></span>
+                </button>
+            </form>
+
+            <div id="results-area">
+                <div class="result-card">
+                    <h5 class="text-center mb-4 text-muted"
+                        style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Equivalent Sizes</h5>
+                    <table class="conversion-table">
+                        <tbody>
+                            <tr>
+                                <td>🇺🇸 US</td>
+                                <td id="res-US">-</td>
+                            </tr>
+                            <tr>
+                                <td>🇪🇺 EU</td>
+                                <td id="res-EU">-</td>
+                            </tr>
+                            <tr>
+                                <td>🇬🇧 UK</td>
+                                <td id="res-UK">-</td>
+                            </tr>
+                            <tr>
+                                <td>🇯🇵 CM</td>
+                                <td id="res-CM">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Error Alert -->
+            <div id="error-alert" class="alert alert-danger mt-3"
+                style="display:none; border-radius: 12px; font-size: 0.9rem;" role="alert">
+                Could not find a match. Please check your input.
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Logic -->
+    <script>
+        // Placeholder Logic
+        const scaleSelect = document.getElementById('scale');
+        const sizeInput = document.getElementById('size');
+
+        const placeholders = {
+            'US': 'e.g. 9.5',
+            'EU': 'e.g. 42',
+            'UK': 'e.g. 8',
+            'CM': 'e.g. 26.5'
+        };
+
+        scaleSelect.addEventListener('change', function () {
+            const selected = this.value;
+            sizeInput.placeholder = placeholders[selected] || 'e.g. 10';
+            // Optional: clear input when scale changes to avoid confusion
+            sizeInput.value = '';
+        });
+
+        // Initialize placeholder
+        sizeInput.placeholder = placeholders[scaleSelect.value];
+
+        document.getElementById('converter-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // UI State - Loading
+            const btn = document.querySelector('.btn-convert');
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+            const resultsArea = document.getElementById('results-area');
+            const errorAlert = document.getElementById('error-alert');
+
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'inline-block';
+            btn.disabled = true;
+            errorAlert.style.display = 'none';
+
+            // Hide previous results slightly
+            if (resultsArea.classList.contains('show')) {
+                resultsArea.classList.remove('show');
+                await new Promise(r => setTimeout(r, 300)); // wait for animation
+            }
+
+            // Gather Data
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const scale = document.getElementById('scale').value;
+            const size = document.getElementById('size').value;
+
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ gender, scale, size })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Update DOM
+                    document.getElementById('res-US').textContent = data.conversions.US;
+                    document.getElementById('res-EU').textContent = data.conversions.EU;
+                    document.getElementById('res-UK').textContent = data.conversions.UK;
+                    document.getElementById('res-CM').textContent = data.conversions.CM + ' cm';
+
+                    // Show Results
+                    resultsArea.classList.add('show');
+                } else {
+                    errorAlert.textContent = data.error || "That size doesn't look right. Try again?";
+                    errorAlert.style.display = 'block';
+                }
+
+            } catch (err) {
+                console.error(err);
+                errorAlert.textContent = "Something went wrong connecting to the server.";
+                errorAlert.style.display = 'block';
+            } finally {
+                // Restore UI
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
