@@ -1,0 +1,32 @@
+name: Build and Push Docker Image
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build-and-push:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            # تسجيل الدخول ما زال يتطلب كلمة المرور المخزنة في Secrets
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: klvvr1 # تم وضع اسم المستخدم مباشرة هنا
+                  password: Qweasdqwe1.
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Build and push
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  # سيتم رفع الصورة باسم: klvvr1/shoesize-app
+                  tags: klvvr1/shoesize-app:latest
