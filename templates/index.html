@@ -513,7 +513,28 @@
 
     <!-- Logic -->
     <script>
-        // Translations
+        // 1. DOM Elements & Constants
+        const htmlElement = document.documentElement;
+
+        // Language Elements
+        const langToggle = document.getElementById('lang-toggle');
+        const langText = langToggle.querySelector('.lang-text');
+
+        // Theme Elements
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('.theme-icon');
+
+        // Form Elements
+        const converterForm = document.getElementById('converter-form');
+        const scaleSelect = document.getElementById('scale');
+        const sizeInput = document.getElementById('size');
+        const btn = document.querySelector('.btn-convert');
+        const btnText = document.getElementById('btn-text');
+        const btnSpinner = document.getElementById('btn-spinner');
+        const resultsArea = document.getElementById('results-area');
+        const errorAlert = document.getElementById('error-alert');
+
+        // Translations Data
         const translations = {
             en: {
                 title: "Size Converter",
@@ -559,14 +580,66 @@
             }
         };
 
-        // Current Language State
+        // 2. Logic Functions
+
+        // --- Language Logic ---
+        function setLanguage(lang) {
+            // Safety check
+            if (!translations[lang]) lang = 'en';
+
+            const t = translations[lang];
+
+            // Update Text Content with data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.textContent = t[key];
+            });
+
+            // Update Direction, Font, and Lang Attribute
+            if (lang === 'ar') {
+                htmlElement.setAttribute('dir', 'rtl');
+                htmlElement.setAttribute('lang', 'ar');
+                document.body.style.fontFamily = "'Cairo', sans-serif";
+                langText.textContent = "عربي";
+            } else {
+                htmlElement.setAttribute('dir', 'ltr');
+                htmlElement.setAttribute('lang', 'en');
+                document.body.style.fontFamily = "'Outfit', sans-serif";
+                langText.textContent = "EN";
+            }
+
+            // Update placeholders
+            updatePlaceholder(lang);
+        }
+
+        function updatePlaceholder(lang = currentLang) {
+            const selected = scaleSelect.value;
+
+            if (lang === 'ar') {
+                // Arabic placeholders
+                sizeInput.placeholder = "مثال 9.5";
+            } else {
+                // English placeholders map
+                const placeholders = {
+                    'US': 'e.g. 9.5',
+                    'EU': 'e.g. 42',
+                    'UK': 'e.g. 8',
+                    'CM': 'e.g. 26.5'
+                };
+                sizeInput.placeholder = placeholders[selected] || 'e.g. 10';
+            }
+        }
+
+        // --- Theme Logic ---
+        function updateIcon(theme) {
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+
+        // 3. Initialization & Even Listeners
+
+        // -- Initialize Language --
         let currentLang = localStorage.getItem('lang') || 'en';
-
-        // Language Toggle Logic
-        const langToggle = document.getElementById('lang-toggle');
-        const langText = langToggle.querySelector('.lang-text');
-
-        // Initial set
         setLanguage(currentLang);
 
         langToggle.addEventListener('click', () => {
@@ -575,39 +648,7 @@
             localStorage.setItem('lang', currentLang);
         });
 
-        function setLanguage(lang) {
-            const t = translations[lang];
-
-            // Update Text Content
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (t[key]) el.textContent = t[key];
-            });
-
-            // Update Direction and Font
-            if (lang === 'ar') {
-                document.documentElement.setAttribute('dir', 'rtl');
-                document.documentElement.setAttribute('lang', 'ar');
-                document.body.style.fontFamily = "'Cairo', sans-serif";
-                langText.textContent = "عربي";
-            } else {
-                document.documentElement.setAttribute('dir', 'ltr');
-                document.documentElement.setAttribute('lang', 'en');
-                document.body.style.fontFamily = "'Outfit', sans-serif";
-                langText.textContent = "EN";
-            }
-
-            // Trigger placeholder update
-            updatePlaceholder();
-        }
-
-
-        // Theme Toggling Logic
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('.theme-icon');
-        const htmlElement = document.documentElement;
-
-        // Check local storage
+        // -- Initialize Theme --
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             htmlElement.setAttribute('data-theme', savedTheme);
@@ -623,50 +664,17 @@
             updateIcon(newTheme);
         });
 
-        function updateIcon(theme) {
-            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-        }
-
-        // Placeholder Logic
-        const scaleSelect = document.getElementById('scale');
-        const sizeInput = document.getElementById('size');
-
-        function updatePlaceholder() {
-            const selected = scaleSelect.value;
-            // Simple logic: if AR, use generic AR example, else specific EN examples
-            // Or we could map them fully. For simplicity:
-            if (currentLang === 'ar') {
-                // You could become more specific if needed
-                sizeInput.placeholder = "مثال 9.5";
-            } else {
-                const placeholders = {
-                    'US': 'e.g. 9.5',
-                    'EU': 'e.g. 42',
-                    'UK': 'e.g. 8',
-                    'CM': 'e.g. 26.5'
-                };
-                sizeInput.placeholder = placeholders[selected] || 'e.g. 10';
-            }
-        }
-
+        // -- Input Field Logic --
         scaleSelect.addEventListener('change', () => {
-            updatePlaceholder();
+            updatePlaceholder(currentLang);
             sizeInput.value = '';
         });
 
-        // Initialize placeholder
-        updatePlaceholder(); // Call once on load
-
-        document.getElementById('converter-form').addEventListener('submit', async function (e) {
+        // -- Form Submission Logic --
+        converterForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
             // UI State - Loading
-            const btn = document.querySelector('.btn-convert');
-            const btnText = document.getElementById('btn-text');
-            const btnSpinner = document.getElementById('btn-spinner');
-            const resultsArea = document.getElementById('results-area');
-            const errorAlert = document.getElementById('error-alert');
-
             btnText.style.display = 'none';
             btnSpinner.style.display = 'inline-block';
             btn.disabled = true;
@@ -680,8 +688,8 @@
 
             // Gather Data
             const gender = document.querySelector('input[name="gender"]:checked').value;
-            const scale = document.getElementById('scale').value;
-            const size = document.getElementById('size').value;
+            const scale = scaleSelect.value;
+            const size = sizeInput.value;
 
             try {
                 const response = await fetch('/convert', {
@@ -703,7 +711,7 @@
                     resultsArea.classList.add('show');
                 } else {
                     // Use translated error message
-                    const t = translations[currentLang];
+                    const t = translations[currentLang] || translations['en'];
                     errorAlert.textContent = response.status === 404 ? t.error_not_found : (data.error || t.error_generic);
                     errorAlert.style.display = 'block';
                 }
