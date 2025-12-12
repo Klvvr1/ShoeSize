@@ -8,7 +8,9 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Cairo:wght@400;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -366,10 +368,61 @@
         .theme-icon {
             font-size: 1.5rem;
         }
+
+        /* Language Toggle Button */
+        .lang-toggle {
+            position: absolute;
+            top: 20px;
+            right: 80px;
+            /* Position next to theme toggle */
+            background: var(--card-glass);
+            border: 1px solid var(--card-border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 10px var(--shadow-heavy);
+            transition: all 0.3s ease;
+            z-index: 100;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .lang-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        [dir="rtl"] .theme-toggle {
+            right: auto;
+            left: 20px;
+        }
+
+        [dir="rtl"] .lang-toggle {
+            right: auto;
+            left: 80px;
+        }
+
+        [dir="rtl"] .conversion-table th {
+            text-align: right;
+        }
+
+        [dir="rtl"] .conversion-table tr td:last-child {
+            text-align: left;
+        }
     </style>
 </head>
 
 <body>
+    <!-- Language Toggle -->
+    <div class="lang-toggle" id="lang-toggle" title="Switch Language">
+        <span class="lang-text">EN</span>
+    </div>
+
     <!-- Theme Toggle -->
     <div class="theme-toggle" id="theme-toggle" title="Toggle Dark Mode">
         <span class="theme-icon">🌙</span>
@@ -384,39 +437,39 @@
 
     <div class="app-container">
         <div class="card">
-            <h1>Size Converter</h1>
+            <h1 data-i18n="title">Size Converter</h1>
 
             <form id="converter-form">
                 <!-- Gender Selection -->
                 <div class="mb-3">
-                    <label class="form-label d-block text-center">Select Gender</label>
+                    <label class="form-label d-block text-center" data-i18n="gender_label">Select Gender</label>
                     <div class="btn-group-custom">
                         <input type="radio" class="gender-radio" name="gender" id="gender-men" value="men" checked>
-                        <label class="gender-label" for="gender-men">Men</label>
+                        <label class="gender-label" for="gender-men" data-i18n="men">Men</label>
 
                         <input type="radio" class="gender-radio" name="gender" id="gender-women" value="women">
-                        <label class="gender-label" for="gender-women">Women</label>
+                        <label class="gender-label" for="gender-women" data-i18n="women">Women</label>
                     </div>
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-5 col-12">
-                        <label for="scale" class="form-label">Unit</label>
+                        <label for="scale" class="form-label" data-i18n="unit_label">Unit</label>
                         <select class="form-select" id="scale" required>
-                            <option value="US" selected>US Setup</option>
-                            <option value="EU">EU Sizes</option>
-                            <option value="UK">UK Sizes</option>
-                            <option value="CM">CM (Japan)</option>
+                            <option value="US" selected data-i18n="unit_us">US Setup</option>
+                            <option value="EU" data-i18n="unit_eu">EU Sizes</option>
+                            <option value="UK" data-i18n="unit_uk">UK Sizes</option>
+                            <option value="CM" data-i18n="unit_cm">CM (Japan)</option>
                         </select>
                     </div>
                     <div class="col-md-7 col-12">
-                        <label for="size" class="form-label">Size</label>
+                        <label for="size" class="form-label" data-i18n="size_label">Size</label>
                         <input type="number" step="0.5" class="form-control" id="size" placeholder="e.g. 9.5" required>
                     </div>
                 </div>
 
                 <button type="submit" class="btn-convert ripple">
-                    <span id="btn-text">Convert Now</span>
+                    <span id="btn-text" data-i18n="convert_btn">Convert Now</span>
                     <span id="btn-spinner" class="spinner" style="display: none;"></span>
                 </button>
             </form>
@@ -424,23 +477,24 @@
             <div id="results-area">
                 <div class="result-card">
                     <h5 class="text-center mb-4 text-muted"
-                        style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Equivalent Sizes</h5>
+                        style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;"
+                        data-i18n="results_title">Equivalent Sizes</h5>
                     <table class="conversion-table">
                         <tbody>
                             <tr>
-                                <td>🇺🇸 US</td>
+                                <td data-i18n="res_us">🇺🇸 US</td>
                                 <td id="res-US">-</td>
                             </tr>
                             <tr>
-                                <td>🇪🇺 EU</td>
+                                <td data-i18n="res_eu">🇪🇺 EU</td>
                                 <td id="res-EU">-</td>
                             </tr>
                             <tr>
-                                <td>🇬🇧 UK</td>
+                                <td data-i18n="res_uk">🇬🇧 UK</td>
                                 <td id="res-UK">-</td>
                             </tr>
                             <tr>
-                                <td>🇯🇵 CM</td>
+                                <td data-i18n="res_cm">🇯🇵 CM</td>
                                 <td id="res-CM">-</td>
                             </tr>
                         </tbody>
@@ -451,7 +505,7 @@
             <!-- Error Alert -->
             <div id="error-alert" class="alert alert-danger mt-3"
                 style="display:none; border-radius: 12px; font-size: 0.9rem;" role="alert">
-                Could not find a match. Please check your input.
+                <!-- Error message will be set by JavaScript -->
             </div>
 
         </div>
@@ -459,6 +513,95 @@
 
     <!-- Logic -->
     <script>
+        // Translations
+        const translations = {
+            en: {
+                title: "Size Converter",
+                gender_label: "Select Gender",
+                men: "Men",
+                women: "Women",
+                unit_label: "Unit",
+                unit_us: "US Setup",
+                unit_eu: "EU Sizes",
+                unit_uk: "UK Sizes",
+                unit_cm: "CM (Japan)",
+                size_label: "Size",
+                convert_btn: "Convert Now",
+                results_title: "Equivalent Sizes",
+                res_us: "🇺🇸 US",
+                res_eu: "🇪🇺 EU",
+                res_uk: "🇬🇧 UK",
+                res_cm: "🇯🇵 CM",
+                error_not_found: "Could not find a match. Please check your input.",
+                error_generic: "Something went wrong connecting to the server.",
+                placeholder_default: "e.g. 10"
+            },
+            ar: {
+                title: "محول المقاسات",
+                gender_label: "اختر الجنس",
+                men: "رجال",
+                women: "نساء",
+                unit_label: "الوحدة",
+                unit_us: "مقاس أمريكي (US)",
+                unit_eu: "مقاس أوروبي (EU)",
+                unit_uk: "مقاس بريطاني (UK)",
+                unit_cm: "سم (CM)",
+                size_label: "المقاس",
+                convert_btn: "تحويل الآن",
+                results_title: "المقاسات المقابلة",
+                res_us: "🇺🇸 أمريكي",
+                res_eu: "🇪🇺 أوروبي",
+                res_uk: "🇬🇧 بريطاني",
+                res_cm: "🇯🇵 سم",
+                error_not_found: "لم يتم العثور على مقاس مطابق. يرجى التحقق من المدخلات.",
+                error_generic: "حدث خطأ أثناء الاتصال بالخادم.",
+                placeholder_default: "مثال 42"
+            }
+        };
+
+        // Current Language State
+        let currentLang = localStorage.getItem('lang') || 'en';
+
+        // Language Toggle Logic
+        const langToggle = document.getElementById('lang-toggle');
+        const langText = langToggle.querySelector('.lang-text');
+
+        // Initial set
+        setLanguage(currentLang);
+
+        langToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            setLanguage(currentLang);
+            localStorage.setItem('lang', currentLang);
+        });
+
+        function setLanguage(lang) {
+            const t = translations[lang];
+
+            // Update Text Content
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.textContent = t[key];
+            });
+
+            // Update Direction and Font
+            if (lang === 'ar') {
+                document.documentElement.setAttribute('dir', 'rtl');
+                document.documentElement.setAttribute('lang', 'ar');
+                document.body.style.fontFamily = "'Cairo', sans-serif";
+                langText.textContent = "عربي";
+            } else {
+                document.documentElement.setAttribute('dir', 'ltr');
+                document.documentElement.setAttribute('lang', 'en');
+                document.body.style.fontFamily = "'Outfit', sans-serif";
+                langText.textContent = "EN";
+            }
+
+            // Trigger placeholder update
+            updatePlaceholder();
+        }
+
+
         // Theme Toggling Logic
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('.theme-icon');
@@ -488,22 +631,31 @@
         const scaleSelect = document.getElementById('scale');
         const sizeInput = document.getElementById('size');
 
-        const placeholders = {
-            'US': 'e.g. 9.5',
-            'EU': 'e.g. 42',
-            'UK': 'e.g. 8',
-            'CM': 'e.g. 26.5'
-        };
+        function updatePlaceholder() {
+            const selected = scaleSelect.value;
+            // Simple logic: if AR, use generic AR example, else specific EN examples
+            // Or we could map them fully. For simplicity:
+            if (currentLang === 'ar') {
+                // You could become more specific if needed
+                sizeInput.placeholder = "مثال 9.5";
+            } else {
+                const placeholders = {
+                    'US': 'e.g. 9.5',
+                    'EU': 'e.g. 42',
+                    'UK': 'e.g. 8',
+                    'CM': 'e.g. 26.5'
+                };
+                sizeInput.placeholder = placeholders[selected] || 'e.g. 10';
+            }
+        }
 
-        scaleSelect.addEventListener('change', function () {
-            const selected = this.value;
-            sizeInput.placeholder = placeholders[selected] || 'e.g. 10';
-            // Optional: clear input when scale changes to avoid confusion
+        scaleSelect.addEventListener('change', () => {
+            updatePlaceholder();
             sizeInput.value = '';
         });
 
         // Initialize placeholder
-        sizeInput.placeholder = placeholders[scaleSelect.value];
+        updatePlaceholder(); // Call once on load
 
         document.getElementById('converter-form').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -550,13 +702,16 @@
                     // Show Results
                     resultsArea.classList.add('show');
                 } else {
-                    errorAlert.textContent = data.error || "That size doesn't look right. Try again?";
+                    // Use translated error message
+                    const t = translations[currentLang];
+                    errorAlert.textContent = response.status === 404 ? t.error_not_found : (data.error || t.error_generic);
                     errorAlert.style.display = 'block';
                 }
 
             } catch (err) {
                 console.error(err);
-                errorAlert.textContent = "Something went wrong connecting to the server.";
+                const t = translations[currentLang] || translations.en;
+                errorAlert.textContent = t.error_generic;
                 errorAlert.style.display = 'block';
             } finally {
                 // Restore UI
